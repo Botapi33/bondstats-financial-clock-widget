@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>BondStats Live Financial Centre Clocks</title>
+<style>
+:root{
+  --bg:#060907;--card:#09100c;--border:#1b2a21;--border2:#24362b;
+  --text:#f3f6f3;--muted:#7d8a82;--muted2:#536058;--green:#78e65b;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-width:0;background:transparent;color:var(--text);
+font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{width:100%;background:var(--bg);padding:16px 10px 20px;overflow:hidden}
+.title{font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;
+margin:0 0 12px;color:#e9eeea}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+.card{min-width:0;border:1px solid var(--border);border-radius:17px;padding:14px 14px 13px;
+background:linear-gradient(180deg,#09100c,#080d0a);display:flex;flex-direction:column;align-items:center}
+.top{width:100%;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.city{font-size:13px;font-weight:760;letter-spacing:-.01em;white-space:nowrap}
+.zone{font-size:9px;color:var(--muted2);letter-spacing:.12em;margin-top:3px;text-transform:uppercase}
+.badge{border:1px solid var(--border);border-radius:999px;padding:5px 8px;color:var(--muted2);
+font-size:8px;white-space:nowrap;line-height:1}
+.badge.open{color:var(--green);border-color:rgba(120,230,91,.26);background:rgba(120,230,91,.035)}
+.clock{width:min(112px,70%);aspect-ratio:1;margin:16px auto 13px;position:relative;border:1px solid var(--border2);
+border-radius:50%;background:radial-gradient(circle at 50% 50%,rgba(120,230,91,.035),transparent 42%)}
+.tick{position:absolute;left:50%;top:50%;width:1px;height:8px;background:#425047;
+transform-origin:50% calc(56px - 1px)}
+.hand{position:absolute;left:50%;bottom:50%;transform-origin:50% 100%;border-radius:4px}
+.hour{width:3px;height:29%;background:#d8ded9;margin-left:-1.5px}
+.minute{width:2px;height:38%;background:#aeb8b1;margin-left:-1px}
+.second{width:1px;height:42%;background:var(--green);margin-left:-.5px}
+.pin{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px;border-radius:50%;background:var(--green);
+box-shadow:0 0 8px rgba(120,230,91,.35)}
+.digital{font-size:22px;line-height:1;font-weight:650;letter-spacing:-.035em;font-variant-numeric:tabular-nums;
+white-space:nowrap}
+.desc{font-size:9px;color:var(--muted);text-align:center;line-height:1.35;margin-top:9px;min-height:24px}
+.device-mobile .wrap{padding:12px 8px 14px}
+.device-mobile .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.device-mobile .card{padding:12px 11px}
+.device-mobile .card:last-child{grid-column:1/-1}
+.device-mobile .card:last-child .clock{width:96px}
+.device-mobile .clock{width:90px;margin:12px auto 10px}
+.device-mobile .digital{font-size:20px}
+.device-mobile .desc{min-height:0}
+@media(max-width:700px){
+ .wrap{padding:12px 8px 14px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .card{padding:12px 11px}.card:last-child{grid-column:1/-1}.clock{width:90px;margin:12px auto 10px}
+ .digital{font-size:20px}.desc{min-height:0}
+}
+@media(max-width:360px){
+ .city{font-size:11px}.badge{font-size:7px;padding:4px 6px}.clock{width:78px}
+ .digital{font-size:18px}.desc{font-size:8px}
+}
+</style>
+</head>
+<body>
+<section class="wrap" id="root">
+  <h1 class="title">Live Financial Centre Clocks</h1>
+  <div class="grid" id="grid"></div>
+</section>
+<script>
+(()=>{
+"use strict";
+const centres=[
+ {city:"Tokyo",abbr:"JST",zone:"Asia/Tokyo",open:540,close:930,desc:"Asia rates & sovereign liquidity"},
+ {city:"Singapore",abbr:"SGT",zone:"Asia/Singapore",open:540,close:1020,desc:"FX, treasury & regional funding"},
+ {city:"Hong Kong",abbr:"HKT",zone:"Asia/Hong_Kong",open:570,close:960,desc:"China / offshore liquidity bridge"},
+ {city:"London",abbr:"UK",zone:"Europe/London",open:480,close:990,desc:"Global FX & transatlantic handover"},
+ {city:"New York",abbr:"ET",zone:"America/New_York",open:570,close:960,desc:"Treasuries, dollar funding & macro data"}
+];
+const root=document.getElementById("root"),grid=document.getElementById("grid");
+const mobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||"")||
+ (screen&&Math.min(screen.width,screen.height)<=700);
+if(mobile)root.classList.add("device-mobile");
+
+function fmt(zone,opts){return new Intl.DateTimeFormat("en-GB",{timeZone:zone,...opts})}
+const parts=centres.map(c=>fmt(c.zone,{weekday:"short",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}));
+const times=centres.map(c=>fmt(c.zone,{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}));
+
+function ticks(){
+ let s="";
+ for(let i=0;i<12;i++)s+=`<i class="tick" style="transform:translate(-50%,-50%) rotate(${i*30}deg) translateY(-48px)"></i>`;
+ return s;
+}
+const cards=centres.map(c=>{
+ const el=document.createElement("article");el.className="card";
+ el.innerHTML=`<div class="top"><div><div class="city">${c.city}</div><div class="zone">${c.abbr}</div></div>
+ <div class="badge" data-badge>Off core hours</div></div>
+ <div class="clock">${ticks()}<i class="hand hour"></i><i class="hand minute"></i><i class="hand second"></i><i class="pin"></i></div>
+ <div class="digital" data-time>--:--:--</div><div class="desc">${c.desc}</div>`;
+ grid.appendChild(el);return el;
+});
+function localParts(d,i){
+ const o={};for(const p of parts[i].formatToParts(d))if(p.type!=="literal")o[p.type]=p.value;return o;
+}
+function update(){
+ const now=new Date();
+ centres.forEach((c,i)=>{
+  const p=localParts(now,i),h=+p.hour%24,m=+p.minute,s=+p.second;
+  const mins=h*60+m,weekend=p.weekday==="Sat"||p.weekday==="Sun",open=!weekend&&mins>=c.open&&mins<c.close;
+  const card=cards[i],badge=card.querySelector("[data-badge]");
+  card.querySelector("[data-time]").textContent=times[i].format(now);
+  badge.textContent=open?"Core hours":"Off core hours";badge.classList.toggle("open",open);
+  card.querySelector(".hour").style.transform=`rotate(${(h%12)*30+m*.5}deg)`;
+  card.querySelector(".minute").style.transform=`rotate(${m*6+s*.1}deg)`;
+  card.querySelector(".second").style.transform=`rotate(${s*6}deg)`;
+ });
+}
+try{centres.forEach(c=>fmt(c.zone,{}).format(new Date()));update();setInterval(update,1000)}
+catch(e){console.error("BondStats clock",e)}
+})();
+</script>
+</body>
+</html>
