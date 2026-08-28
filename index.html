@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>BondStats Global Financial Clock</title>
+<style>
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+    background: #060907;
+  }
+
+  body {
+    min-height: 100%;
+  }
+
+  .clock-shell {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  bondstats-financial-clock {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+  }
+
+  /* Keep the host itself fluid even when embedded by Google Sites. */
+  @media (max-width: 700px) {
+    html, body, .clock-shell, bondstats-financial-clock {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+    }
+  }
+</style>
+
+<script>
+  window.BondStatsConfig = {
+    links: {
+      clock: "https://www.bondstats.org/"
+    }
+  };
+</script>
+
+<script
+  src="https://botapi33.github.io/bondstats-embed-sdk/embed.js"
+  defer>
+</script>
+</head>
+
+<body>
+  <main class="clock-shell">
+    <bondstats-financial-clock></bondstats-financial-clock>
+  </main>
+</body>
+</html>
