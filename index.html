@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>BondStats Global Financial Clock</title>
+<style>
+:root{
+  --bg:#050806;
+  --panel:#08100b;
+  --panel2:#0a120d;
+  --line:rgba(139,166,148,.16);
+  --line-strong:rgba(117,231,91,.25);
+  --text:#f3f7f4;
+  --muted:#7f8d84;
+  --muted2:#536158;
+  --green:#75e75b;
+  --mobile-w:280px;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0!important;padding:0!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  overflow-x:hidden!important;
+  background:transparent!important;color:var(--text);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+body{display:block}
+
+/* MOBILE IS THE SAFE DEFAULT. */
+.shell{
+  width:var(--mobile-w);
+  max-width:var(--mobile-w);
+  min-width:0;
+  margin:0;
+  padding:10px 0 12px 8px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 30% -20%,rgba(117,231,91,.05),transparent 35%),
+    var(--bg);
+}
+.desktop-view{display:none}
+.mobile-view{display:block;width:100%;max-width:100%}
+.kicker{
+  margin:0 0 9px 1px;
+  font-size:8px;font-weight:800;letter-spacing:.20em;
+  text-transform:uppercase;color:#dce4de;
+}
+.mobile-list{
+  display:flex;flex-direction:column;gap:7px;
+  width:100%;max-width:100%;
+}
+.m-row{
+  width:100%;max-width:100%;min-width:0;
+  height:76px;
+  display:grid;
+  grid-template-columns:56px minmax(0,1fr);
+  grid-template-rows:auto auto;
+  column-gap:10px;
+  align-items:center;
+  padding:9px 10px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+}
+.m-face{
+  grid-column:1;grid-row:1/3;
+  position:relative;
+  width:52px;height:52px;
+  border:1px solid #26382d;border-radius:50%;
+  background:radial-gradient(circle,rgba(117,231,91,.045),transparent 48%);
+}
+.tick{
+  position:absolute;left:50%;top:2px;
+  width:1px;height:5px;background:#405047;
+  transform-origin:50% 24px;
+}
+.hand{
+  position:absolute;left:50%;bottom:50%;
+  transform-origin:50% 100%;border-radius:99px;
+}
+.hour{width:3px;height:27%;margin-left:-1.5px;background:#dfe5e0}
+.minute{width:2px;height:37%;margin-left:-1px;background:#aab5ad}
+.second{width:1px;height:42%;margin-left:-.5px;background:var(--green)}
+.pin{
+  position:absolute;left:50%;top:50%;
+  width:6px;height:6px;margin:-3px;border-radius:50%;
+  background:var(--green);
+}
+.m-main{
+  grid-column:2;grid-row:1;
+  min-width:0;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:6px;
+}
+.m-city-wrap{min-width:0}
+.m-city{
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:11px;font-weight:760;line-height:1.1;
+}
+.m-zone{
+  margin-top:3px;color:var(--muted2);
+  font-size:6.5px;letter-spacing:.12em;text-transform:uppercase;
+}
+.state{
+  flex:0 0 auto;
+  max-width:76px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  padding:4px 5px;border:1px solid var(--line);border-radius:999px;
+  color:var(--muted2);font-size:5.8px;line-height:1;
+}
+.state.open{
+  color:var(--green);border-color:var(--line-strong);
+  background:rgba(117,231,91,.035);
+}
+.m-bottom{
+  grid-column:2;grid-row:2;
+  min-width:0;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:7px;
+}
+.m-time{
+  min-width:0;
+  font-size:18px;line-height:1;font-weight:650;
+  letter-spacing:-.035em;font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.m-hours{
+  flex:0 0 auto;
+  color:var(--muted2);font-size:6px;white-space:nowrap;
+}
+
+/* Desktop is progressive enhancement only. */
+html.desktop-ok .shell{
+  width:100%!important;
+  max-width:100%!important;
+  padding:15px 10px 18px;
+}
+html.desktop-ok .mobile-view{display:none}
+html.desktop-ok .desktop-view{display:block}
+.d-grid{
+  width:100%;max-width:100%;min-width:0;
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;
+}
+.d-card{
+  min-width:0;overflow:hidden;
+  border:1px solid var(--line);border-radius:17px;
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  padding:14px 13px 13px;text-align:center;
+}
+.d-top{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  gap:7px;text-align:left;
+}
+.d-place{min-width:0}
+.d-city{
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:13px;font-weight:760;
+}
+.d-zone{
+  margin-top:4px;color:var(--muted2);
+  font-size:8px;letter-spacing:.12em;text-transform:uppercase;
+}
+.d-face{
+  position:relative;
+  width:min(104px,74%);aspect-ratio:1;
+  margin:15px auto 13px;
+  border:1px solid #26382d;border-radius:50%;
+  background:radial-gradient(circle,rgba(117,231,91,.045),transparent 48%);
+}
+.d-face .tick{height:8px;transform-origin:50% 49px}
+.d-face .pin{width:8px;height:8px;margin:-4px}
+.d-time{
+  font-size:22px;line-height:1;font-weight:650;
+  letter-spacing:-.035em;font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.d-date{margin-top:6px;color:var(--muted2);font-size:8px}
+.d-note{
+  margin-top:10px;padding-top:9px;border-top:1px solid rgba(255,255,255,.05);
+  color:var(--muted);font-size:8px;line-height:1.3;
+}
+</style>
+</head>
+<body>
+<main class="shell">
+  <section class="mobile-view" aria-label="Global Financial Clock">
+    <div class="kicker">Live Financial Centre Clocks</div>
+    <div class="mobile-list" id="mobileList"></div>
+  </section>
+
+  <section class="desktop-view" aria-label="Global Financial Clock">
+    <div class="kicker">Live Financial Centre Clocks</div>
+    <div class="d-grid" id="desktopGrid"></div>
+  </section>
+</main>
+
+<script>
+(()=>{
+"use strict";
+
+const centres=[
+ {city:"Tokyo",abbr:"JST",zone:"Asia/Tokyo",open:540,close:930,hours:"09:00–15:30",note:"Asia rates & sovereign liquidity"},
+ {city:"Singapore",abbr:"SGT",zone:"Asia/Singapore",open:540,close:1020,hours:"09:00–17:00",note:"FX, treasury & regional funding"},
+ {city:"Hong Kong",abbr:"HKT",zone:"Asia/Hong_Kong",open:570,close:960,hours:"09:30–16:00",note:"China / offshore liquidity bridge"},
+ {city:"London",abbr:"UK",zone:"Europe/London",open:480,close:990,hours:"08:00–16:30",note:"Global FX & transatlantic handover"},
+ {city:"New York",abbr:"ET",zone:"America/New_York",open:570,close:960,hours:"09:30–16:00",note:"Treasuries, dollar funding & macro data"}
+];
+
+const root=document.documentElement;
+const mobileList=document.getElementById("mobileList");
+const desktopGrid=document.getElementById("desktopGrid");
+
+function realScreenWidth(){
+  const values=[];
+  if(window.screen){
+    if(Number.isFinite(screen.width)&&screen.width>0) values.push(screen.width);
+    if(Number.isFinite(screen.availWidth)&&screen.availWidth>0) values.push(screen.availWidth);
+  }
+  if(window.visualViewport&&Number.isFinite(visualViewport.width)&&visualViewport.width>0) values.push(visualViewport.width);
+  return values.length?Math.min(...values):320;
+}
+
+/* Safe mobile width: always narrower than a phone screen and aligned left.
+   This survives Google Sites reporting a fake 980px iframe viewport. */
+const screenW=realScreenWidth();
+const safeMobile=Math.max(220,Math.min(340,Math.floor(screenW-28)));
+root.style.setProperty("--mobile-w",safeMobile+"px");
+
+/* Switch to desktop ONLY if every desktop signal agrees. */
+const finePointer=window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches;
+const noTouch=(navigator.maxTouchPoints||0)===0;
+const largePhysical=screenW>=900;
+const mobileUA=/Android|iPhone|iPad|iPod|Mobile|IEMobile|Opera Mini/i.test(navigator.userAgent||"");
+
+if(finePointer&&noTouch&&largePhysical&&!mobileUA){
+  root.classList.add("desktop-ok");
+}
+
+function fmt(zone,opts){
+  return new Intl.DateTimeFormat("en-GB",{timeZone:zone,...opts});
+}
+const partsFmt=centres.map(c=>fmt(c.zone,{
+  weekday:"short",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false
+}));
+const timeFmt=centres.map(c=>fmt(c.zone,{
+  hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false
+}));
+const dateFmt=centres.map(c=>fmt(c.zone,{
+  weekday:"short",day:"2-digit",month:"short"
+}));
+
+function ticks(size){
+  let s="";
+  for(let i=0;i<12;i++){
+    s+=`<i class="tick" style="transform:translateX(-50%) rotate(${i*30}deg)"></i>`;
+  }
+  return s;
+}
+
+const mobileCards=centres.map(c=>{
+  const el=document.createElement("article");
+  el.className="m-row";
+  el.innerHTML=`
+    <div class="m-face">
+      ${ticks()}
+      <i class="hand hour"></i><i class="hand minute"></i><i class="hand second"></i><i class="pin"></i>
+    </div>
+    <div class="m-main">
+      <div class="m-city-wrap"><div class="m-city">${c.city}</div><div class="m-zone">${c.abbr}</div></div>
+      <div class="state" data-state>Off hours</div>
+    </div>
+    <div class="m-bottom">
+      <div class="m-time" data-time>--:--:--</div>
+      <div class="m-hours">${c.hours}</div>
+    </div>`;
+  mobileList.appendChild(el);
+  return el;
+});
+
+const desktopCards=centres.map(c=>{
+  const el=document.createElement("article");
+  el.className="d-card";
+  el.innerHTML=`
+    <div class="d-top">
+      <div class="d-place"><div class="d-city">${c.city}</div><div class="d-zone">${c.abbr}</div></div>
+      <div class="state" data-state>Off hours</div>
+    </div>
+    <div class="d-face">
+      ${ticks()}
+      <i class="hand hour"></i><i class="hand minute"></i><i class="hand second"></i><i class="pin"></i>
+    </div>
+    <div class="d-time" data-time>--:--:--</div>
+    <div class="d-date" data-date>---</div>
+    <div class="d-note">${c.note} · ${c.hours}</div>`;
+  desktopGrid.appendChild(el);
+  return el;
+});
+
+function parts(date,i){
+  const out={};
+  for(const p of partsFmt[i].formatToParts(date)){
+    if(p.type!=="literal") out[p.type]=p.value;
+  }
+  return out;
+}
+
+function rotate(card,h,m,s){
+  card.querySelector(".hour").style.transform=`rotate(${(h%12)*30+m*.5}deg)`;
+  card.querySelector(".minute").style.transform=`rotate(${m*6+s*.1}deg)`;
+  card.querySelector(".second").style.transform=`rotate(${s*6}deg)`;
+}
+
+function update(){
+  const now=new Date();
+  centres.forEach((c,i)=>{
+    const p=parts(now,i);
+    const h=(Number(p.hour)||0)%24,m=Number(p.minute)||0,s=Number(p.second)||0;
+    const mins=h*60+m;
+    const weekend=p.weekday==="Sat"||p.weekday==="Sun";
+    const open=!weekend&&mins>=c.open&&mins<c.close;
+
+    for(const card of [mobileCards[i],desktopCards[i]]){
+      card.querySelector("[data-time]").textContent=timeFmt[i].format(now);
+      const state=card.querySelector("[data-state]");
+      state.textContent=open?"Core hours":"Off hours";
+      state.classList.toggle("open",open);
+      rotate(card,h,m,s);
+      const date=card.querySelector("[data-date]");
+      if(date) date.textContent=dateFmt[i].format(now);
+    }
+  });
+}
+
+try{
+  centres.forEach(c=>fmt(c.zone,{}).format(new Date()));
+  update();
+  setInterval(update,1000);
+}catch(e){
+  console.error("BondStats Global Financial Clock",e);
+}
+})();
+</script>
+</body>
+</html>
